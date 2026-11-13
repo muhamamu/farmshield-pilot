@@ -1,0 +1,8 @@
+import React,{useState} from 'react';
+import {findFarmLocations} from './farm-location.mjs';
+export function FarmLocationSearch({initial='',onSelect,required=true}){
+ const [query,setQuery]=useState(initial),[results,setResults]=useState([]),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ async function search(){setBusy(true);setError('');setResults([]);try{const places=await findFarmLocations(query);setResults(places);if(!places.length)setError('No matching Kano place found. Try a nearby town, or pin the exact place on the map.')}catch(error){setError(error.message)}finally{setBusy(false)}}
+ return <div className="farm-location-search"><label>Village or area in Kano{!required&&' (optional with map pin)'}<input name="location" required={required} maxLength={120} value={query} placeholder="e.g. Kura, Kano" onChange={event=>{setQuery(event.target.value);setResults([]);onSelect(null)}}/></label><button type="button" className="secondary wide" disabled={busy} onClick={search}>{busy?'Finding location…':'Find location'}</button>{results.length>0&&<div className="place-results"><p>Choose the matching place:</p>{results.map((place,i)=><button type="button" key={i} onClick={()=>{onSelect(place);setResults([]);setError('Location selected. Save to move the map here.')}}>{place.label}</button>)}</div>}{error&&<p role="status" className="calm-help">{error}</p>}<small>Place search: <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> / <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a>. Finds an area; draw your exact land outline afterward.</small></div>
+}
+

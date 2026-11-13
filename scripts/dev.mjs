@@ -1,0 +1,10 @@
+import {spawn} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+import {startApi} from '../server/index.mjs';
+const api=await startApi();
+console.log(`FarmShield API ready on port ${api.address().port}`);
+const vite=spawn(process.execPath,[fileURLToPath(new URL('../node_modules/vite/bin/vite.js',import.meta.url)),...process.argv.slice(2)],{stdio:'inherit'});
+const close=()=>{vite.kill();api.close();};
+process.on('SIGINT',close);process.on('SIGTERM',close);
+vite.on('error',()=>{api.close();process.exitCode=1;});
+vite.on('exit',code=>{api.close();process.exitCode=code??0;});
