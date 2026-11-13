@@ -6,3 +6,6 @@ data/
 !.env.example
 *.log
 .vercel/
+qa/
+public/assets/farmland.png
+public/assets/farmland-outlined.png
