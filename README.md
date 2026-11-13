@@ -1,5 +1,9 @@
 # FarmShield pilot
 
+Live app: https://farmshield-pilot.vercel.app
+
+Supabase account backups are now available under Workspace > My farms > Account & cloud backup. Sign in through an email link, then explicitly back up or restore your registered farms, outlines and observations. Backups are manual; restore preserves existing local records. See DEPLOYMENT.md for configuration and email delivery limits.
+
 Current primary experience: a real, interactive Kano satellite explorer. Pan and zoom around actual land, roads, buildings and farms; switch labels; jump to Kano city or the countryside; click to pin coordinates. The map remembers its last position. Sample advisory records are separately labelled and are not associated with a clicked location. See MAP-INTEGRATION.md for sources and verification.
 
 Earlier NASA regional snapshots remain available in the backend code for later work; the nationwide gallery is no longer the primary UI.
@@ -30,4 +34,4 @@ In Regional data, select Kano, Kaduna, Ibadan or Abuja and click Connect sources
 
 Tab-local React state resets on reload. This is deliberately a pilot interface, not an agronomic decision system. Review all language and guidance before using them with actual farmers.
 
-Source design and visual verification are documented in design-qa.md. API flow verification is in verification-api.md. The source project is isolated from the existing workspace application. No deployment was performed. A static Sites build does not deploy the new Node API; a backend deployment and routing decision is still required.
+Source design and visual verification are documented in design-qa.md. API flow verification is in verification-api.md. Vercel now deploys the frontend and Node API together using vercel.json. The existing Sites package remains available separately.
