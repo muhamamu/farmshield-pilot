@@ -1,0 +1,30 @@
+:root{--ease-out:cubic-bezier(.23,1,.32,1);--ease-drawer:cubic-bezier(.32,.72,0,1)}
+/* Account actions have visible button boundaries, including at rest. */
+.calm-app .topbar-actions{gap:10px}
+.calm-app .account-nav{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 15px;border:1px solid #b7c7a8;border-radius:9px;background:#fffef9;color:#214d31;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.calm-app .admin-nav{background:#e5edda;border-color:#a8bb94;color:#294e2a}
+.calm-app .signup-nav{background:#194c30;border-color:#194c30;color:#fff}
+.calm-app .signin-nav{padding-inline:11px}
+.calm-app .topbar-place{margin-right:4px;white-space:nowrap}
+.calm-app .workspace-button{min-height:44px;white-space:nowrap}
+.calm-app .account-nav svg{flex-shrink:0}
+/* Interruptible feedback; map imagery and review data remain stationary. */
+.calm-app .topbar-actions button,.account-layout button,.admin-page button,.calm-app .primary,.calm-app .secondary{transition:transform 160ms var(--ease-out),opacity 160ms var(--ease-out)}
+.calm-app .workspace-button>svg:last-child{transition:transform 160ms var(--ease-out)}
+@media(hover:hover) and (pointer:fine){
+ .calm-app .account-nav:hover{background:#edf3e5;border-color:#7e9b6b}
+ .calm-app .admin-nav:hover{background:#d9e6c9}
+ .calm-app .signup-nav:hover{background:#28613c;color:#fff}
+ :root:not([data-input=keyboard]) .topbar-actions button:not(:disabled):hover,:root:not([data-input=keyboard]) .account-layout .primary:not(:disabled):hover,:root:not([data-input=keyboard]) .admin-page .primary:not(:disabled):hover{transform:translateY(-2px)}
+ :root:not([data-input=keyboard]) .workspace-button:hover>svg:last-child{transform:translateX(3px)}
+}
+:root:not([data-input=keyboard]) .calm-app .topbar-actions button:not(:disabled):active,:root:not([data-input=keyboard]) .account-layout button:not(:disabled):active,:root:not([data-input=keyboard]) .admin-page button:not(:disabled):active,:root:not([data-input=keyboard]) .calm-app .primary:not(:disabled):active,:root:not([data-input=keyboard]) .calm-app .secondary:not(:disabled):active{transform:scale(.97)}
+.account-form-wrap,.account-story>div,.admin-intro,.explore-heading{opacity:1;transform:translateY(0);transition:opacity 240ms var(--ease-out),transform 240ms var(--ease-out)}
+@starting-style{:root:not([data-input=keyboard]) .account-form-wrap,:root:not([data-input=keyboard]) .account-story>div,:root:not([data-input=keyboard]) .admin-intro,:root:not([data-input=keyboard]) .explore-heading{opacity:0;transform:translateY(10px)}}
+.calm-app .workspace-drawer{animation:drawer-in 280ms var(--ease-drawer)}
+.calm-app .calm-modal{animation:modal-in 240ms var(--ease-out)}
+.calm-app .pin-card{animation:pin-in 200ms var(--ease-out)}
+:root[data-input=keyboard] .calm-app .workspace-drawer,:root[data-input=keyboard] .calm-app .calm-modal,:root[data-input=keyboard] .calm-app .drawer-backdrop,:root[data-input=keyboard] .calm-app .calm-modal-backdrop{animation:none}
+@media(max-width:1050px){.calm-app .app-topbar{padding-inline:16px;margin-inline:20px;gap:14px}.calm-app .topbar-place{display:none}.calm-app .account-nav{padding-inline:12px}}
+@media(max-width:700px){.calm-app .app-topbar{position:relative;height:auto;min-height:112px;padding:16px 0 12px;margin:0 16px;flex-wrap:wrap;gap:13px}.calm-app .topbar-actions{width:100%;flex-wrap:wrap;gap:8px}.calm-app .account-nav{flex:1;font-size:11px;padding:10px}.calm-app .workspace-button{flex:1;justify-content:center;padding:10px;font-size:11px}.calm-app .topbar-actions>.quiet-icon{position:absolute;right:0;top:14px;min-height:32px;width:32px}.calm-app .satellite-map{height:calc(100dvh - 294px)}}
+@media(prefers-reduced-motion:reduce){.account-layout *,.admin-page *,.calm-app *,.access-page *{animation:none!important;transition:none!important;scroll-behavior:auto!important}.account-layout button,.admin-page button,.calm-app .topbar-actions button,.calm-app .primary,.calm-app .secondary,.calm-app .workspace-button>svg:last-child{transform:none!important}}

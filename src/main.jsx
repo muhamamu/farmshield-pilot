@@ -1,10 +1,15 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { App } from "./App.jsx";
+import { Router } from "./Router.jsx";
+import {AuthProvider} from "./AuthContext.jsx";
 import "./styles.css";
+import "./accounts.css";
+import "./motion.css";
+import "./profile.css";
+import "./lifecycle.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <AuthProvider><Router /></AuthProvider>
   </React.StrictMode>,
 );
