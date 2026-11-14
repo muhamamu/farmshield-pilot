@@ -82,3 +82,10 @@ Currently approved counts active farms whose latest submission is approved. Tota
 
 Run tests/farm-lifecycle-access.sql in one transaction to verify deletion isolation and restoration; fixtures roll back. Weather remains unavailable until OPEN_METEO_API_KEY is set in Vercel production and the app is redeployed. Farmers see a plain unavailable message; admins get setup instructions.
 
+## Primary account farm store
+
+The account_cloud_farms, bind_farm_import_account and preserve_submissions_in_cloud_store migrations are applied. Their combined source is supabase/cloud-farms.sql. farmshield_farms stores the complete private farm payload, server timestamps and a revision. Only its owner can select/insert/update; even assigned admins read only the separate verification submissions. Deletion remains in farmshield_farm_state.
+
+The active workspace no longer writes farm records to browser storage or requires manual backups. FarmImport reads older device records and previous farmshield_backups snapshots explicitly. Imports are atomic, bound to the intended account and refuse to overwrite edited cloud records. Successfully imported device records are cleaned up; failed or skipped sources stay intact. Existing real submissions were carried over before the cloud store went live.
+
+The old manual-backup sections above describe the legacy source format. They are superseded for all new farm edits. Save callbacks in observations, soil and planting tools await the cloud write before reporting success. Weather setup is documented here; it is not shown as a developer message in the product.
