@@ -5,7 +5,6 @@ const formatDate=value=>new Intl.DateTimeFormat('en-NG',{day:'numeric',month:'sh
 const formatTime=value=>new Intl.DateTimeFormat('en-NG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Africa/Lagos'}).format(new Date(value));
 const number=value=>value===null||value===undefined?'—':Number(value).toFixed(1);
 export function RegionalData({expanded=false}){
- const {isAdmin}=useAuth();
  const [location,setLocation]=useState('kano'),[results,setResults]=useState({}),[loading,setLoading]=useState(false);
  const controller=useRef(null);
  useEffect(()=>()=>controller.current?.abort(),[]);
