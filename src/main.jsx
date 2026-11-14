@@ -9,6 +9,7 @@ import "./profile.css";
 import "./lifecycle.css";
 import "./cloud-storage.css";
 import "./admin-map.css";
+import "./nigeria-map.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
