@@ -1,0 +1,8 @@
+.calm-app .map-options .satellite-tools{width:280px;max-width:calc(100vw - 60px)}
+.map-place-search{padding:6px 0 12px;border-bottom:1px solid #dce2d4;margin-bottom:6px}
+.map-place-search label{display:block;font-size:13px;font-weight:600;margin-bottom:8px}
+.map-place-search form>div{display:grid;grid-template-columns:minmax(0,1fr) 38px;gap:6px}
+.map-place-search input{min-width:0;width:100%;border:1px solid #bbc9b7;border-radius:7px;padding:9px;background:#fffef9;color:#16452b;font:inherit;font-size:13px}
+.calm-app .map-options .map-place-search form button{width:38px;min-height:38px;padding:0;display:grid;place-items:center;background:#194e32;color:white;border-radius:7px}
+.map-place-search p,.map-place-search small{display:block;font-size:11px;line-height:1.5;margin:8px 0 0}
+.calm-app .map-options .map-place-results button{white-space:normal;text-align:left;line-height:1.4;padding:9px 5px;font-size:13px}
