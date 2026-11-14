@@ -2,7 +2,7 @@
 
 Live app: https://farmshield-pilot.vercel.app
 
-FarmShield combines a real Kano satellite map with account-owned farm records,
+FarmShield combines a real Nigeria satellite map with account-owned farm records,
 field observations, advisory drafts and admin verification. It contains no seeded
 farmers or fictional field alerts.
 
@@ -55,3 +55,5 @@ Applied migration sources include supabase/registration-review.sql,
 supabase/farm-lifecycle.sql and supabase/cloud-farms.sql. Transactional SQL tests in
 `tests/*-access.sql` verify access controls and roll back their fixtures.
 See verification-cloud-farms.md for verification results and remaining limitations.
+
+The map opens on Nigeria. Search Nigeria & layers finds Nigerian towns and cities; the overview control returns to the country view. Admins can still show all approved farms.
