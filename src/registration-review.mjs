@@ -20,7 +20,12 @@ export function latestSubmissions(rows) {
   }
   return [...latest.values()].sort((a,b)=>b.created_at.localeCompare(a.created_at));
 }
-export function decisionFor(row) {return [...(row.farmshield_reviews||[])].sort((a,b)=>b.created_at.localeCompare(a.created_at))[0]||null;}
+export function decisionFor(row) {
+  const reviews=row.farmshield_reviews;
+  // The unique registration foreign key makes this a one-to-one PostgREST embed.
+  if(!Array.isArray(reviews))return reviews||null;
+  return [...reviews].sort((a,b)=>b.created_at.localeCompare(a.created_at))[0]||null;
+}
 export function snapshotMatches(farm,row) {
   return farm.name.trim()===row.farm_name&&farm.crop.trim()===row.crop&&farm.location.trim()===row.location&&farm.size===Number(row.area_ha)&&farm.point?.lat===row.latitude&&farm.point?.lon===row.longitude&&JSON.stringify(farm.boundary||[])===JSON.stringify(row.boundary||[]);
 }
