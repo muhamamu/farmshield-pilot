@@ -19,6 +19,12 @@ test('newest submission is isolated by owner and local farm',()=>{
   const rows=[{id:'old',owner_id:'a',local_farm_id:'x',created_at:'2026-01-01'}, {id:'other-owner',owner_id:'b',local_farm_id:'x',created_at:'2026-01-02'}, {id:'new',owner_id:'a',local_farm_id:'x',created_at:'2026-01-03'}];
   assert.deepEqual(latestSubmissions(rows).map(r=>r.id),['new','other-owner']);
 });
+test('review decisions support the unique foreign key one-to-one API response',()=>{
+  const review={status:'approved',notes:'Checked',created_at:'2026-11-14'};
+  assert.equal(decisionFor({farmshield_reviews:review}),review);
+  assert.equal(decisionFor({farmshield_reviews:[review]}),review);
+  assert.equal(decisionFor({farmshield_reviews:null}),null);
+});
 test('approval applies only to matching submitted details and outline',()=>{
   const row=submissionSnapshot(farm,contact);assert.equal(snapshotMatches(farm,row),true);
   assert.equal(snapshotMatches({...farm,crop:'Rice'},row),false);
