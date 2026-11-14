@@ -6,6 +6,7 @@ import "./styles.css";
 import "./accounts.css";
 import "./motion.css";
 import "./profile.css";
+import "./lifecycle.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
