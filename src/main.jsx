@@ -4,6 +4,7 @@ import { Router } from "./Router.jsx";
 import {AuthProvider} from "./AuthContext.jsx";
 import "./styles.css";
 import "./accounts.css";
+import "./motion.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
