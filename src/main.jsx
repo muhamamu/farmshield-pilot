@@ -17,3 +17,5 @@ createRoot(document.getElementById("root")).render(
     <AuthProvider><Router /></AuthProvider>
   </React.StrictMode>,
 );
+
+import "./field-data.css";
