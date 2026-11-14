@@ -1,10 +1,26 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {createDataService,createApi,LOCATIONS,normalizeWeather,normalizeScenes} from '../server/providers.mjs';
+import {resolveDataPoint} from '../shared/data-point.mjs';
 const now=Date.parse('2026-11-13T10:00:00Z');
 const dates=Array.from({length:7},(_,i)=>`2026-11-${13+i}`);
 const weather=()=>({timezone:'Africa/Lagos',latitude:12,longitude:8.6,current_units:{temperature_2m:'°C',relative_humidity_2m:'%'},current:{time:'2026-11-13T11:00',temperature_2m:30,relative_humidity_2m:20},daily_units:{temperature_2m_max:'°C',temperature_2m_min:'°C',precipitation_sum:'mm',et0_fao_evapotranspiration:'mm'},daily:{time:dates,temperature_2m_max:[30,null,32,33,34,35,36],temperature_2m_min:Array(7).fill(20),precipitation_sum:Array(7).fill(0),et0_fao_evapotranspiration:Array(7).fill(5)}});
 const response=data=>new Response(JSON.stringify(data));
+test('farm coordinate requests use the selected point instead of a reference city',async()=>{
+ let upstream;const api=createApi(createDataService({now:()=>now,fetchImpl:async url=>{upstream=url;return response(weather());}}));
+ const result=await api(new Request('http://localhost/api/weather?lat=6.52&lon=3.38'));
+ assert.equal(result.status,200);assert.equal(upstream.searchParams.get('latitude'),'6.52');assert.equal(upstream.searchParams.get('longitude'),'3.38');
+ const body=await result.json();assert.equal(body.location.latitude,6.52);assert.equal(body.location.longitude,3.38);
+});
+test('coordinate validation rejects invalid, out of range, duplicate and mixed requests',async()=>{
+ const api=createApi(createDataService({fetchImpl:async()=>assert.fail('No upstream request allowed')}));
+ for(const query of ['lat=50&lon=3','lat=&lon=3','lat=abc&lon=7','lat=9','lat=9&lon=7&location=kano','lat=9&lat=10&lon=7','lat=9&lon=7&url=https://example.com'])assert.equal((await api(new Request('http://localhost/api/weather?'+query))).status,400);
+ for(const value of [null,{lat:true,lon:7},{lat:Infinity,lon:7}])assert.equal(resolveDataPoint(value),null);
+});
+test('satellite coordinates produce a local search box with no private farm information',async()=>{
+ let upstream;const service=createDataService({now:()=>now,fetchImpl:async url=>{upstream=url;return response({type:'FeatureCollection',features:[]});}});
+ const result=await service.get('satellite-scenes',{lat:6.52,lon:3.38});assert.deepEqual(result.bbox,[3.33,6.47,3.43,6.57]);assert.equal(upstream.hostname,'stac.dataspace.copernicus.eu');
+});
 test('weather normalization retains missing temperature and true zero rainfall',()=>{
  const result=normalizeWeather(weather(),LOCATIONS.kano,new Date(now).toISOString(),'evaluation');
  assert.equal(result.days[1].maxTemperatureC,null);assert.equal(result.days[0].precipitationMm,0);assert.equal(result.current.temperatureC,30);
