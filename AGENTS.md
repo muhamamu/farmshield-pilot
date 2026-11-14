@@ -15,3 +15,5 @@ User design preference: friendly and uncluttered. Keep the Nigeria map as the ma
 Keep the current visual style. Give signup/account and admin actions visible button borders, icons and clear labels. Add subtle interaction and panel motion; keep map content and review data stationary. Keep navigation readable on narrow screens.
 
 Supabase is the primary farm store. Persist farm details, outlines, observations, plans and saved drafts to the signed-in account. Keep legacy device/backup import explicit and preserve source records until an import succeeds. Remove fictional farms, seeded activity, sample selectors and reset-demo actions from product UI. Keep weather errors concise and place provider configuration in deployment documentation.
+
+Data tools should feel like a useful farm conditions view: use saved farms, a map pin or nationwide place search; load sources automatically. Never silently default to a reference city. Show dated weather, rainfall and satellite catalogue records with plain-language limits, compact cards and honest unavailable states.
