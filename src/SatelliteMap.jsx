@@ -3,11 +3,12 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {ArrowsOut,ArrowsIn,MapPin,Crosshair,Warning,Stack,Plus,Minus} from '@phosphor-icons/react';
 import {NIGERIA_BOUNDS as BBOX,NIGERIA_HOME as HOME,NIGERIA_VIEW_KEY as STORE,validNigeriaView} from './nigeria-map.mjs';
+import {mayRememberMap} from './consent.mjs';
 import {MapPlaceSearch} from './MapPlaceSearch.jsx';
 import {boundaryError,boundaryAreaHa,formatAreaHa} from '../shared/farm-boundary.mjs';
 const IMAGERY='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const LABELS='https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
-function savedView(){try{const view=JSON.parse(localStorage.getItem(STORE));if(validNigeriaView(view))return view;}catch{}return null;}
+function savedView(){if(!mayRememberMap())return null;try{const view=JSON.parse(localStorage.getItem(STORE));if(validNigeriaView(view))return view;}catch{}return null;}
 export function SatelliteMap({onPick,clearPinKey=0,boundaryFarm,savedFarms=[],approvedFarms=[],allowGlobal=false,mapFocus,onBoundarySave,onBoundaryCancel}){
  const [ready,setReady]=useState(false);
  const drawing=useRef(null),outlineLayer=useRef(null),saveBoundary=useRef(onBoundarySave);
@@ -52,7 +53,7 @@ export function SatelliteMap({onPick,clearPinKey=0,boundaryFarm,savedFarms=[],ap
   imagery.addTo(m);
   const labels=L.tileLayer(LABELS,{maxZoom:19,maxNativeZoom:18,noWrap:true,attribution:'Labels © Esri'}).addTo(m);labelsLayer.current=labels;
   L.control.scale({position:'bottomleft',imperial:false,maxWidth:120}).addTo(m);
-  const update=()=>{const p=m.getCenter(),v={lat:p.lat,lon:p.lng,zoom:m.getZoom()};setView(v);try{localStorage.setItem(STORE,JSON.stringify(v))}catch{}};
+  const update=()=>{const p=m.getCenter(),v={lat:p.lat,lon:p.lng,zoom:m.getZoom()};setView(v);try{if(mayRememberMap())localStorage.setItem(STORE,JSON.stringify(v))}catch{}};
   m.on('moveend zoomend',update);update();
   m.on('click',event=>{if(drawing.current){setCorners(items=>[...items,[event.latlng.lat,event.latlng.lng]]);setDrawError('');return}const point={lat:Number(event.latlng.lat.toFixed(6)),lon:Number(event.latlng.lng.toFixed(6))};if(marker.current)m.removeLayer(marker.current);marker.current=L.circleMarker(event.latlng,{radius:7,color:'#fff',weight:3,fillColor:'#16452b',fillOpacity:1}).addTo(m);pick.current?.(point);});
   const observer=new ResizeObserver(()=>m.invalidateSize({pan:false}));observer.observe(canvas.current);
