@@ -8,6 +8,7 @@ import "./motion.css";
 import "./profile.css";
 import "./lifecycle.css";
 import "./cloud-storage.css";
+import "./admin-map.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
