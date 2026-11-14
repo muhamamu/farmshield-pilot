@@ -7,6 +7,7 @@ import "./accounts.css";
 import "./motion.css";
 import "./profile.css";
 import "./lifecycle.css";
+import "./cloud-storage.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
