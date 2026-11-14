@@ -15,3 +15,5 @@ User design preference: friendly and uncluttered. Keep the Kano map as the main 
 Keep the current visual style. Give signup/account and admin actions visible button borders, icons and clear labels. Add subtle interaction and panel motion; keep map content and review data stationary. Keep navigation readable on narrow screens.
 
 Supabase is the primary farm store. Persist farm details, outlines, observations, plans and saved drafts to the signed-in account. Keep legacy device/backup import explicit and preserve source records until an import succeeds. Remove fictional farms, seeded activity, sample selectors and reset-demo actions from product UI. Keep weather errors concise and place provider configuration in deployment documentation.
+
+Admins can view all currently approved farm submission pins and outlines on the main map. Use the latest submission per owner/farm, exclude deleted or unapproved farms, and keep private farm payloads restricted to their owner.
