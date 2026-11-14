@@ -4,6 +4,7 @@ const AuthContext=createContext(null);
 export function AuthProvider({children}) {
   const [session,setSession]=useState(null),[loading,setLoading]=useState(Boolean(supabase)),[isAdmin,setIsAdmin]=useState(false),[error,setError]=useState(''),[recovery,setRecovery]=useState(false);
   const generation=useRef(0);
+  useEffect(()=>{document.documentElement.dataset.reduceMotion=String(session?.user.user_metadata?.reduce_motion===true);},[session?.user.user_metadata?.reduce_motion]);
   useEffect(()=>{
     if(!supabase)return;
     let active=true,authEvent=false;
