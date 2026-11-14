@@ -1,37 +1,57 @@
-# FarmShield pilot
+# FarmShield
 
 Live app: https://farmshield-pilot.vercel.app
 
-Supabase account backups are now available under Workspace > My farms > Account & cloud backup. Sign in through an email link, then explicitly back up or restore your registered farms, outlines and observations. Backups are manual; restore preserves existing local records. See DEPLOYMENT.md for configuration and email delivery limits.
+FarmShield combines a real Kano satellite map with account-owned farm records,
+field observations, advisory drafts and admin verification. It contains no seeded
+farmers or fictional field alerts.
 
-Current primary experience: a real, interactive Kano satellite explorer. Pan and zoom around actual land, roads, buildings and farms; switch labels; jump to Kano city or the countryside; click to pin coordinates. The map remembers its last position. Sample advisory records are separately labelled and are not associated with a clicked location. See MAP-INTEGRATION.md for sources and verification.
+## Accounts and farms
 
-Earlier NASA regional snapshots remain available in the backend code for later work; the nationwide gallery is no longer the primary UI.
+Sign in to register a farm. Farm details, reference pins, land outlines, observations,
+soil readings, planting plans and saved advisory drafts persist directly in Supabase.
+They load wherever the farmer signs in. Unsaved text drafts stay in memory until saved.
 
-A development pilot for a Nigerian agricultural cooperative adviser. Sample farmers, field positions, field observations and the map are fictional or generated. A separate regional panel connects to real Open-Meteo forecasts and Copernicus Sentinel-2 catalogue metadata.
+Workspace > My farms offers an explicit import for older device farms and any previous
+cloud backup. An import preserves edited cloud records and only removes device records
+after a successful upload. The latest existing verification submissions were carried
+into the primary farm store automatically.
 
-## Run
+Farm verification remains separate: farmers explicitly submit their location and contact
+details, and assigned admins approve, reject or request corrections. Private field notes
+stay private. Deleted farms retain their data and review history and can be restored.
+Currently approved totals exclude deleted farms; total ever approved counts each farm once.
 
-Use Node.js and npm:
+## Map and weather
+
+Pan and zoom real satellite imagery in Kano, toggle place labels and draw farm outlines.
+The camera position is remembered on the device. Imagery dates and detail vary; a pin or
+outline is not proof of ownership. See MAP-INTEGRATION.md.
+
+Regional data connects to weather and Sentinel-2 catalogue services. Forecast failures
+show an unavailable state without inventing values. Production Open-Meteo access needs
+OPEN_METEO_API_KEY on the server. See DEPLOYMENT.md and .env.example.
+Earlier NASA research endpoints remain available; see NASA-API.md.
+
+## Development
+
+Use Node 22 or newer:
 
 ```sh
 npm install
 npm run dev -- --host 127.0.0.1 --port 4174
+npm test
+npm run build
 ```
 
-Open http://127.0.0.1:4174/ . The dev command starts the local Node API on port 4180 and Vite on 4174. Build with `npm run build`. Run adapter tests with `npm run test:api` and hosting checks with `npm run test:sites` after building.
+The dev command starts the Node API on port 4180 and Vite on the requested port.
+Build output supports Vercel and the existing Sites package.
 
-In Regional data, select Kano, Kaduna, Ibadan or Abuja and click Connect sources. The panel distinguishes actual regional forecast/catalogue results from the sample fields. The NASA Earth Observation viewer additionally loads real, dated Terra/MODIS true-colour imagery using public NASA GIBS; no NASA key is needed for this service. See NASA-API.md for interpretation limits and verification. Provider errors are shown without substituting demo values. No account is needed for the public catalogue search. Weather uses prototype evaluation access locally; commercial use requires the paid provider endpoint and a server-side key. See API-PLAN.md and .env.example.
+Supabase uses VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in the browser.
+Never put a service-role key in Vite variables. Database policies restrict saved farm
+records to their owner; review snapshots use separate owner/admin access rules.
 
-## Demonstrate
-
-1. Select Amina's plot from the map or table.
-2. Switch English/Hausa and edit an advisory draft.
-3. Preview and save the sample message; recent activity updates. No SMS is sent.
-4. Record a field check with soil condition and notes. Dry or unassessed conditions flag follow-up.
-5. Select another field to view its crop, stage and draft.
-6. Export the session as JSON or reset the sample state.
-
-Tab-local React state resets on reload. This is deliberately a pilot interface, not an agronomic decision system. Review all language and guidance before using them with actual farmers.
-
-Source design and visual verification are documented in design-qa.md. API flow verification is in verification-api.md. Vercel now deploys the frontend and Node API together using vercel.json. The existing Sites package remains available separately.
+Applied migration sources include supabase/registration-review.sql,
+supabase/farm-lifecycle.sql and supabase/cloud-farms.sql. Transactional SQL tests in
+`tests/*-access.sql` verify access controls and roll back their fixtures.
+See verification-cloud-farms.md for verification results and remaining limitations.
