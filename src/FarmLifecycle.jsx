@@ -1,0 +1,9 @@
+import React,{useState} from 'react';
+import {supabase} from './supabase.mjs';
+import {farmDeleted,setFarmDeleted} from './farm-lifecycle.mjs';
+export function FarmLifecycle({row,onChange}){
+ const [confirming,setConfirming]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ const deleted=farmDeleted(row);
+ async function change(next){setBusy(true);setError('');try{const state=await setFarmDeleted(supabase,row.owner_id,row.local_farm_id,next);if(!state)throw new Error('Farm not found or access changed. Refresh and try again.');setConfirming(false);await onChange();}catch(err){setError(err.message||'Unable to update this farm.');}finally{setBusy(false);}}
+ return <section className="farm-lifecycle"><div><strong>{deleted?'Deleted farm':'Farm availability'}</strong>{deleted?<p>Deleted {new Date(row.farmshield_farm_state.deleted_at).toLocaleString('en-GB')} by {row.farmshield_farm_state.deleted_by===row.owner_id?'the farmer':'an administrator'}. Approval history is kept.</p>:<p>Deleting removes this farm from currently approved totals. Its submitted details and review history remain available.</p>}</div>{deleted?<button className="secondary" disabled={busy} onClick={()=>change(false)}>{busy?'Restoring…':'Restore farm'}</button>:confirming?<div className="lifecycle-confirm"><p>Delete {row.farm_name}? This affects the farmer profile and admin dashboard.</p><button className="secondary" disabled={busy} onClick={()=>setConfirming(false)}>Keep farm</button><button className="danger-button" disabled={busy} onClick={()=>change(true)}>{busy?'Deleting…':'Confirm deletion'}</button></div>:<button className="delete-farm-button" disabled={busy} onClick={()=>setConfirming(true)}>Delete farm</button>}{error&&<p role="alert" className="account-error">{error}</p>}</section>;
+}
