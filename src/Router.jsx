@@ -10,7 +10,7 @@ export function Router() {
   useEffect(()=>{const pointer=()=>{document.documentElement.dataset.input='pointer';};const keyboard=()=>{document.documentElement.dataset.input='keyboard';};document.addEventListener('pointerdown',pointer,true);document.addEventListener('keydown',keyboard,true);return()=>{document.removeEventListener('pointerdown',pointer,true);document.removeEventListener('keydown',keyboard,true);};},[]);
   useEffect(()=>{const pop=()=>setPath(window.location.pathname);window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[]);
   function navigate(next){window.history.pushState({},'',next);setPath(next);window.scrollTo(0,0);}
-  useEffect(()=>{document.title=(path==='/account'?'My account':path==='/admin'?'Admin review':path==='/signup'?'Create account':path==='/signin'?'Sign in':'Explore Kano')+' · FarmShield';},[path]);
+  useEffect(()=>{document.title=(path==='/account'?'My account':path==='/admin'?'Admin review':path==='/signup'?'Create account':path==='/signin'?'Sign in':'Explore Nigeria')+' · FarmShield';},[path]);
   let content;
   if(recovery||path==='/update-password')content=<AccountPage key={path} mode="update-password" navigate={navigate}/>;
   else if(path==='/account'||(session&&['/signin','/signup','/reset-password'].includes(path)))content=<ProfilePage key={session?.user.id||'guest'} navigate={navigate}/>;
