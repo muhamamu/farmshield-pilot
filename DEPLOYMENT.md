@@ -1,3 +1,11 @@
+## Weather provider update (15 November 2026)
+
+FarmShield defaults to MET Norway Locationforecast through its server API. No paid weather key is needed. WEATHER_PROVIDER=met-norway is the code default. The server identifies itself using the public FarmShield GitHub URL, truncates forecast coordinates to four decimal places, respects provider expiry and sends If-Modified-Since for revalidation. Caches and request deduplication apply per running server instance. Larger deployments need a shared gateway/cache and application-wide traffic controls.
+
+The operator confirmed acceptance of MET Norway terms on 15 November 2026: https://docs.api.met.no/doc/TermsOfService.html. Attribution includes MET Norway, CC BY 4.0 and the adaptation into summaries. Forecast days use complete UTC periods (01:00–01:00 WAT), starting the following day. Temperature ranges are sampled estimates. Missing rain and ET0 remain unavailable; the current model value and next-six-hour rain are shown separately.
+
+Planting Planner now uses /api/weather. Place search and soil estimates retain their existing services. For optional Open-Meteo forecasts, set WEATHER_PROVIDER=open-meteo and configure its paid key for production. Older Open-Meteo setup notes below apply only to that optional provider.
+
 # FarmShield deployment
 
 ## Verification
