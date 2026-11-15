@@ -1,0 +1,37 @@
+begin;
+do $test$
+declare a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();admin_id uuid:=gen_random_uuid();farm uuid:=gen_random_uuid();entry_id uuid:=gen_random_uuid();task_id uuid:=gen_random_uuid();photo text;seen int;denied bool;
+begin
+ insert into auth.users(id,aud,role,email) values(a,'authenticated','authenticated',a||'@activity-test.invalid'),(b,'authenticated','authenticated',b||'@activity-test.invalid'),(admin_id,'authenticated','authenticated',admin_id||'@activity-test.invalid');
+ insert into public.farmshield_admins(user_id) values(admin_id);
+ perform set_config('request.jwt.claims',json_build_object('sub',a,'role','authenticated','is_anonymous',false)::text,true);
+ execute 'set local role authenticated';
+ insert into public.farmshield_farms(owner_id,local_farm_id,payload) values(a,farm,jsonb_build_object('id',farm::text,'name','Test farm','crop','Maize','location','Test location','size',1));
+ photo:=a||'/'||farm||'/'||entry_id||'/'||gen_random_uuid()||'.jpg';
+ insert into public.farmshield_journal(id,owner_id,local_farm_id,kind,entry_date,notes,photo_paths) values(entry_id,a,farm,'planting',current_date,'Private test note',array[photo]);
+ insert into public.farmshield_tasks(id,owner_id,local_farm_id,title,due_date,remind_on,source_alert_key) values(task_id,a,farm,'Test field check',current_date,current_date,'heat:test');
+ update public.farmshield_tasks set completed=true where id=task_id;
+ select count(*) into seen from public.farmshield_tasks where id=task_id and completed_at is not null and revision=2;if seen<>1 then raise exception 'Completion stamp/revision failed';end if;
+ insert into storage.objects(bucket_id,name) values('farmshield-journal',photo);
+ denied:=false;begin insert into storage.objects(bucket_id,name) values('farmshield-journal',b||'/'||farm||'/'||entry_id||'/'||gen_random_uuid()||'.jpg');exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Cross-owner photo upload allowed';end if;
+ denied:=false;begin insert into public.farmshield_journal(owner_id,local_farm_id,kind,entry_date,notes) values(b,farm,'other',current_date,'Spoof');exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Owner spoof allowed';end if;
+ denied:=false;begin update public.farmshield_journal set photo_paths=array[b||'/'||farm||'/'||entry_id||'/'||gen_random_uuid()||'.jpg'] where id=entry_id;exception when raise_exception then denied:=true;end;if not denied then raise exception 'Foreign photo reference allowed';end if;
+ denied:=false;begin insert into public.farmshield_tasks(owner_id,local_farm_id,title,due_date,remind_on,source_alert_key) values(a,farm,'Duplicate alert',current_date,current_date,'heat:test');exception when unique_violation then denied:=true;end;if not denied then raise exception 'Duplicate alert task allowed';end if;
+ perform set_config('request.jwt.claims',json_build_object('sub',b,'role','authenticated')::text,true);
+ select count(*) into seen from public.farmshield_journal where id=entry_id;if seen<>0 then raise exception 'Other farmer can read journal';end if;
+ select count(*) into seen from public.farmshield_tasks where id=task_id;if seen<>0 then raise exception 'Other farmer can read tasks';end if;
+ select count(*) into seen from storage.objects where bucket_id='farmshield-journal' and name=photo;if seen<>0 then raise exception 'Other farmer can read photo';end if;
+ perform set_config('request.jwt.claims',json_build_object('sub',admin_id,'role','authenticated')::text,true);
+ select count(*) into seen from public.farmshield_journal where id=entry_id;if seen<>0 then raise exception 'Admin can read private journal';end if;
+ select count(*) into seen from storage.objects where bucket_id='farmshield-journal' and name=photo;if seen<>0 then raise exception 'Admin can read private photo';end if;
+ perform set_config('request.jwt.claims',json_build_object('sub',a,'role','authenticated')::text,true);
+ update public.farmshield_journal set archived=true where id=entry_id;
+ update public.farmshield_journal set archived=false where id=entry_id;
+ update public.farmshield_farm_state set deleted_at=clock_timestamp() where owner_id=a and local_farm_id=farm;
+ denied:=false;begin insert into public.farmshield_tasks(owner_id,local_farm_id,title,due_date,remind_on) values(a,farm,'Deleted farm',current_date,current_date);exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Deleted farm accepts tasks';end if;
+ select count(*) into seen from public.farmshield_journal where id=entry_id;if seen<>1 then raise exception 'Soft deletion lost journal';end if;
+ execute 'set local role anon';denied:=false;begin perform 1 from public.farmshield_journal;exception when insufficient_privilege then denied:=true;end;if not denied then raise exception 'Anonymous journal access';end if;
+ execute 'reset role';
+end $test$;
+select 'PASS: owner isolation, private admin denial, photo path isolation, completion stamps, revision, duplicate alert prevention, archive/restore, deleted-farm guard and anonymous denial' as result;
+rollback;
