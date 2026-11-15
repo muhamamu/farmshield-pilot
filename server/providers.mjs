@@ -1,3 +1,4 @@
+import {resolveDataPoint} from '../shared/data-point.mjs';
 import {REGIONS,ZONES,BOUNDARY_SOURCE} from '../shared/nigeria-regions.mjs';
 export const LOCATIONS = Object.freeze({
   kano: {name:'Kano reference point', latitude:12.0022, longitude:8.5920},
@@ -53,11 +54,13 @@ export function createDataService({fetchImpl=fetch,now=()=>Date.now(),apiKey='',
     return response.json();
   }
   async function get(kind,id){
-    const location=LOCATIONS[id];
-    if(!Object.hasOwn(LOCATIONS,id))throw new ApiError(400,'INVALID_LOCATION','Select a supported Nigerian reference point.');
+    const custom=typeof id==='object'?resolveDataPoint(id):null;
+    const location=custom||(typeof id==='string'&&Object.hasOwn(LOCATIONS,id)?LOCATIONS[id]:null);
+    if(!location)throw new ApiError(400,'INVALID_LOCATION','Choose a valid location in Nigeria.');
+    const locationKey=custom?custom.latitude+','+custom.longitude:id;
     if(!['weather','satellite-scenes'].includes(kind))throw new ApiError(404,'NOT_FOUND','Endpoint not found.');
     if(kind==='weather'&&((mode!=='evaluation'&&mode!=='commercial')||((production||mode==='commercial')&&!apiKey)))throw new ApiError(503,'WEATHER_CONFIGURATION_REQUIRED','Commercial weather access requires a server-side Open-Meteo API key.');
-    const key=kind+':'+id,ttl=kind==='weather'?15*60*1000:60*60*1000;
+    const key=kind+':'+locationKey,ttl=kind==='weather'?15*60*1000:60*60*1000;
     const hit=cache.get(key);
     if(hit&&now()-hit.time<ttl)return {...hit.data,cached:true};
     if(pending.has(key))return pending.get(key);
@@ -77,6 +80,7 @@ export function createDataService({fetchImpl=fetch,now=()=>Date.now(),apiKey='',
           url.search=new URLSearchParams({collections:'sentinel-2-l2a',bbox:bbox.join(','),datetime:period.from+'/'+period.to,limit:'5',sortby:'-properties.datetime'});
           data=normalizeScenes(await json(url),location,fetchedAt,period,bbox);
         }
+        if(cache.size>=128)cache.delete(cache.keys().next().value);
         cache.set(key,{time:now(),data});return {...data,cached:false};
       }catch(error){
         // Never expose provider URLs, credentials, error bodies or stack traces.
@@ -107,8 +111,11 @@ export function createApi(service,nasa){
       }
       const match=/^\/api\/(weather|satellite-scenes)$/.exec(url.pathname);
       if(!match)throw new ApiError(404,'NOT_FOUND','Endpoint not found.');
-      if([...url.searchParams.keys()].some(key=>key!=='location')||url.searchParams.getAll('location').length!==1)throw new ApiError(400,'INVALID_QUERY','Provide one location parameter.');
-      return Response.json(await service.get(match[1],url.searchParams.get('location')),{headers});
+      const params=url.searchParams,keys=[...params.keys()];let target;
+      if(keys.length===1&&params.getAll('location').length===1)target=params.get('location');
+      else if(keys.length===2&&params.getAll('lat').length===1&&params.getAll('lon').length===1&&keys.every(key=>['lat','lon'].includes(key))){target=resolveDataPoint({lat:params.get('lat'),lon:params.get('lon')});if(!target)throw new ApiError(400,'INVALID_LOCATION','Choose a valid location in Nigeria.');}
+      else throw new ApiError(400,'INVALID_QUERY','Provide one reference location or one latitude and longitude pair.');
+      return Response.json(await service.get(match[1],target),{headers});
     }catch(error){
       const known=error instanceof ApiError;
       return Response.json({error:{code:known?error.code:'INTERNAL_ERROR',message:known?error.message:'Request could not be completed.'}},{status:known?error.status:500,headers});

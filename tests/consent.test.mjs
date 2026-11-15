@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readConsent,saveConsent,CONSENT_KEY,MAP_VIEW_KEY} from '../src/consent.mjs';
+function storage(){const data=new Map();return {getItem:key=>data.get(key)??null,setItem:(key,value)=>data.set(key,value),removeItem:key=>data.delete(key)};}
+test('optional storage is denied until a current explicit choice is saved',()=>{const s=storage();assert.equal(readConsent(s),null);saveConsent(s,true,1000);assert.equal(readConsent(s,1001).preferences,true);assert.equal(readConsent(s,1000+180*86400000),null);assert.equal(readConsent(s,999),null);});
+test('rejecting or withdrawing preferences removes only map storage',()=>{const s=storage();s.setItem(MAP_VIEW_KEY,'map');s.setItem('sb-auth-token','session');s.setItem('farmshield-farms-v1','legacy');saveConsent(s,false,1000);assert.equal(s.getItem(MAP_VIEW_KEY),null);assert.equal(s.getItem('sb-auth-token'),'session');assert.equal(s.getItem('farmshield-farms-v1'),'legacy');assert.equal(readConsent(s,1000).preferences,false);saveConsent(s,true,1001);s.setItem(MAP_VIEW_KEY,'new map');saveConsent(s,false,1002);assert.equal(s.getItem(MAP_VIEW_KEY),null);});
+test('malformed, outdated and unavailable browser storage never grants consent',()=>{const s=storage();for(const value of ['bad','null',JSON.stringify({version:1,preferences:'true',savedAt:1000}),JSON.stringify({version:0,preferences:true,savedAt:1000})]){s.setItem(CONSENT_KEY,value);assert.equal(readConsent(s,1001),null);}assert.equal(readConsent({getItem(){throw Error('blocked')}}),null);});

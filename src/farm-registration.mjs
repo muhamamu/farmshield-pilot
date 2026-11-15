@@ -4,5 +4,5 @@ export function registrationDetails(data,selectedPin){
  const place=String(data.get('location')||'').trim();
  if(!name||!crop||!Number.isFinite(size)||size<=0)throw new Error('Add a farm name, crop and an area greater than zero.');
  if(!place&&!point)throw new Error('Enter a village or area, or use a selected map pin.');
- return {name,crop,size,location:place||(point?'Pinned location, Kano':''),point};
+ return {name,crop,size,location:place||(point?'Pinned map location':''),point};
 }
