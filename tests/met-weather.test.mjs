@@ -12,3 +12,12 @@ test('MET requests identify FarmShield, truncate coordinates and honour Expires 
 test('failed revalidation is not reported as a fresh successful forecast',async()=>{let clock=now,fail=false;const service=createMetWeather({now:()=>clock,fetchImpl:async()=>{if(fail)throw Error('private upstream information');return Response.json(fixture());}});await service.get(point);clock+=16*60000;fail=true;await assert.rejects(service.get(point));});
 test('default production weather uses MET without an Open-Meteo key and sanitizes errors',async()=>{const api=createApi(createDataService({production:true,now:()=>now,fetchImpl:async()=>Response.json(fixture())}));const r=await api(new Request('http://localhost/api/weather?location=kano'));assert.equal(r.status,200);assert.equal((await r.json()).provider,'MET Norway');const failing=createApi(createDataService({fetchImpl:async()=>{throw Error('secret upstream url');}}));const result=await failing(new Request('http://localhost/api/weather?location=kano'));assert.equal(result.status,502);assert.doesNotMatch(await result.text(),/secret/);});
 test('planting uses the shared forecast and keeps missing rain unavailable',()=>{const data=normalizeMetWeather(fixture(),point,new Date(now).toISOString());data.days[0].precipitationMm=null;const plan=plantingForecast(data,{lat:12,lon:8.5});assert.equal(plan.provider,'MET Norway');assert.equal(plan.days[0].rain,null);assert.equal(plan.days[1].rain,0);assert.equal(plan.point.lat,12);assert.match(plan.periodLabel,/01:00/);});
+
+test('MET cloud means use complete time-weighted samples and never fill missing cloud values',()=>{
+ const raw=fixture();raw.properties.meta.units.cloud_area_fraction='%';
+ for(const row of raw.properties.timeseries)row.data.instant.details.cloud_area_fraction=new Date(row.time).getUTCHours()<12?0:100;
+ const data=normalizeMetWeather(raw,point,new Date(now).toISOString());assert.equal(data.days[0].cloudCoverPct,50);
+ delete raw.properties.timeseries.find(row=>row.time==='2026-11-16T06:00:00.000Z').data.instant.details.cloud_area_fraction;
+ assert.equal(normalizeMetWeather(raw,point,new Date(now).toISOString()).days[0].cloudCoverPct,null);
+ raw.properties.meta.units.cloud_area_fraction='fraction';assert.equal(normalizeMetWeather(raw,point,new Date(now).toISOString()).days[1].cloudCoverPct,null);
+});

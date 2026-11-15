@@ -1,3 +1,4 @@
+import {createCloudEstimateService} from './cloud-estimate.mjs';
 import {createMetWeather} from './met-weather.mjs';
 import {resolveDataPoint} from '../shared/data-point.mjs';
 import {REGIONS,ZONES,BOUNDARY_SOURCE} from '../shared/nigeria-regions.mjs';
@@ -48,7 +49,7 @@ export function normalizeScenes(raw,location,fetchedAt,period,bbox){
 }
 
 export function createDataService({fetchImpl=fetch,now=()=>Date.now(),apiKey='',mode='evaluation',production=false,timeoutMs=15000,weatherProvider='met-norway'}={}){
-  const cache=new Map(),pending=new Map(),met=createMetWeather({fetchImpl,now,timeoutMs});
+  const cache=new Map(),pending=new Map(),met=createMetWeather({fetchImpl,now,timeoutMs}),cloudHistory=createCloudEstimateService({fetchImpl,now,timeoutMs});
   async function json(url){
     const response=await fetchImpl(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(timeoutMs)});
     if(!response.ok)throw new Error('Provider unavailable');
@@ -59,7 +60,8 @@ export function createDataService({fetchImpl=fetch,now=()=>Date.now(),apiKey='',
     const location=custom||(typeof id==='string'&&Object.hasOwn(LOCATIONS,id)?LOCATIONS[id]:null);
     if(!location)throw new ApiError(400,'INVALID_LOCATION','Choose a valid location in Nigeria.');
     const locationKey=custom?custom.latitude+','+custom.longitude:id;
-    if(!['weather','satellite-scenes'].includes(kind))throw new ApiError(404,'NOT_FOUND','Endpoint not found.');
+    if(!['weather','satellite-scenes','cloud-estimate'].includes(kind))throw new ApiError(404,'NOT_FOUND','Endpoint not found.');
+    if(kind==='cloud-estimate'){try{return await cloudHistory.get(location);}catch{throw new ApiError(502,'PROVIDER_UNAVAILABLE','Historical cloud data could not be loaded. Try again later.');}}
     if(kind==='weather'&&weatherProvider==='met-norway'){try{return await met.get(location);}catch{throw new ApiError(502,'PROVIDER_UNAVAILABLE','Weather could not be loaded. Please try again later.');}}
     if(kind==='weather'&&weatherProvider!=='open-meteo')throw new ApiError(503,'WEATHER_CONFIGURATION_REQUIRED','Weather provider is not configured.');
     if(kind==='weather'&&((mode!=='evaluation'&&mode!=='commercial')||((production||mode==='commercial')&&!apiKey)))throw new ApiError(503,'WEATHER_CONFIGURATION_REQUIRED','Commercial weather access requires a server-side Open-Meteo API key.');
@@ -112,7 +114,7 @@ export function createApi(service,nasa){
         if(url.pathname==='/api/nasa-image')return new Response(await nasa.image(location,date),{headers:{'content-type':'image/png','cache-control':'private, max-age=3600','x-content-type-options':'nosniff'}});
         return Response.json(await nasa.describe(location,date),{headers});
       }
-      const match=/^\/api\/(weather|satellite-scenes)$/.exec(url.pathname);
+      const match=/^\/api\/(weather|satellite-scenes|cloud-estimate)$/.exec(url.pathname);
       if(!match)throw new ApiError(404,'NOT_FOUND','Endpoint not found.');
       const params=url.searchParams,keys=[...params.keys()];let target;
       if(keys.length===1&&params.getAll('location').length===1)target=params.get('location');
