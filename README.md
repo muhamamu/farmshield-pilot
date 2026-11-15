@@ -57,3 +57,5 @@ supabase/farm-lifecycle.sql and supabase/cloud-farms.sql. Transactional SQL test
 See verification-cloud-farms.md for verification results and remaining limitations.
 
 The map opens on Nigeria. Search Nigeria & layers finds Nigerian towns and cities; the overview control returns to the country view. Admins can still show all approved farms.
+
+Weather forecasts now use MET Norway through FarmShield’s server, without an API key. Forecast attribution and period limitations appear in the app. See DEPLOYMENT.md for provider configuration.
