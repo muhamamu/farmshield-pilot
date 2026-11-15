@@ -21,3 +21,5 @@ createRoot(document.getElementById("root")).render(
 import "./field-data.css";
 
 import "./cloud-cover.css";
+
+import "./farm-activity.css";
