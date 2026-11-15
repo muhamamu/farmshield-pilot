@@ -20,7 +20,10 @@ export function normalizeMetWeather(raw,location,fetchedAt){
   }
   // Sampled temperature ranges are not a daily extrema product.
   const usable=temperatures.length>=4&&temperatures.every(value=>value!==null)&&samples[0]?.stamp===from&&samples.at(-1)?.stamp>=to-6*HOUR;
-  return {date:new Date(from).toISOString().slice(0,10),periodStart:new Date(from).toISOString(),periodEnd:new Date(to).toISOString(),maxTemperatureC:usable?Math.max(...temperatures):null,minTemperatureC:usable?Math.min(...temperatures):null,precipitationMm:rain,referenceEt0Mm:null};
+  let cloudSum=0,cloudDuration=0;
+  if(units.cloud_area_fraction==='%')for(const row of samples){const index=entries.indexOf(row),next=entries[index+1],duration=next?Math.min(next.stamp,to)-row.stamp:0,value=finite(row.data?.instant?.details?.cloud_area_fraction);if(value!==null&&value>=0&&value<=100&&duration>0&&duration<=6*HOUR){cloudSum+=value*duration;cloudDuration+=duration;}}
+  const cloudCoverPct=cloudDuration===DAY?Math.round(cloudSum/DAY):null;
+  return {cloudCoverPct,date:new Date(from).toISOString().slice(0,10),periodStart:new Date(from).toISOString(),periodEnd:new Date(to).toISOString(),maxTemperatureC:usable?Math.max(...temperatures):null,minTemperatureC:usable?Math.min(...temperatures):null,precipitationMm:rain,referenceEt0Mm:null};
  });
  if(!days.some(day=>day.maxTemperatureC!==null))throw Error('No usable forecast');
  const current=entries.find(row=>row.stamp>=now-HOUR&&row.stamp<=now+HOUR),details=current?.data?.instant?.details;
