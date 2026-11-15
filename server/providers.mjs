@@ -1,3 +1,4 @@
+import {createMetWeather} from './met-weather.mjs';
 import {resolveDataPoint} from '../shared/data-point.mjs';
 import {REGIONS,ZONES,BOUNDARY_SOURCE} from '../shared/nigeria-regions.mjs';
 export const LOCATIONS = Object.freeze({
@@ -46,8 +47,8 @@ export function normalizeScenes(raw,location,fetchedAt,period,bbox){
     limitations:['Scene discovery only: imagery pixels and vegetation indices have not been processed.','Cloud cover describes the whole scene, not this location or a farm.','Search uses a regional box, not a registered farm boundary.']};
 }
 
-export function createDataService({fetchImpl=fetch,now=()=>Date.now(),apiKey='',mode='evaluation',production=false,timeoutMs=15000}={}){
-  const cache=new Map(),pending=new Map();
+export function createDataService({fetchImpl=fetch,now=()=>Date.now(),apiKey='',mode='evaluation',production=false,timeoutMs=15000,weatherProvider='met-norway'}={}){
+  const cache=new Map(),pending=new Map(),met=createMetWeather({fetchImpl,now,timeoutMs});
   async function json(url){
     const response=await fetchImpl(url,{headers:{accept:'application/json'},signal:AbortSignal.timeout(timeoutMs)});
     if(!response.ok)throw new Error('Provider unavailable');
@@ -59,6 +60,8 @@ export function createDataService({fetchImpl=fetch,now=()=>Date.now(),apiKey='',
     if(!location)throw new ApiError(400,'INVALID_LOCATION','Choose a valid location in Nigeria.');
     const locationKey=custom?custom.latitude+','+custom.longitude:id;
     if(!['weather','satellite-scenes'].includes(kind))throw new ApiError(404,'NOT_FOUND','Endpoint not found.');
+    if(kind==='weather'&&weatherProvider==='met-norway'){try{return await met.get(location);}catch{throw new ApiError(502,'PROVIDER_UNAVAILABLE','Weather could not be loaded. Please try again later.');}}
+    if(kind==='weather'&&weatherProvider!=='open-meteo')throw new ApiError(503,'WEATHER_CONFIGURATION_REQUIRED','Weather provider is not configured.');
     if(kind==='weather'&&((mode!=='evaluation'&&mode!=='commercial')||((production||mode==='commercial')&&!apiKey)))throw new ApiError(503,'WEATHER_CONFIGURATION_REQUIRED','Commercial weather access requires a server-side Open-Meteo API key.');
     const key=kind+':'+locationKey,ttl=kind==='weather'?15*60*1000:60*60*1000;
     const hit=cache.get(key);
