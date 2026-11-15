@@ -7,7 +7,7 @@ import {createNasaService} from './nasa.mjs';
 export function startApi({port=Number(process.env.API_PORT||4180)}={}){
   const envFile=fileURLToPath(new URL('../.env',import.meta.url));
   if(existsSync(envFile))process.loadEnvFile(envFile);
-  const handle=createApi(createDataService({apiKey:process.env.OPEN_METEO_API_KEY||'',mode:process.env.WEATHER_ACCESS_MODE||'evaluation',production:process.env.NODE_ENV==='production'}),createNasaService());
+  const handle=createApi(createDataService({weatherProvider:process.env.WEATHER_PROVIDER||'met-norway',apiKey:process.env.OPEN_METEO_API_KEY||'',mode:process.env.WEATHER_ACCESS_MODE||'evaluation',production:process.env.NODE_ENV==='production'}),createNasaService());
   const server=createServer(async(req,res)=>{
     try{
       const request=new Request(new URL(req.url,'http://127.0.0.1'),{method:req.method});
