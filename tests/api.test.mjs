@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {createDataService,createApi,LOCATIONS,normalizeWeather,normalizeScenes} from '../server/providers.mjs';
+import {createDataService as dataService,createApi,LOCATIONS,normalizeWeather,normalizeScenes} from '../server/providers.mjs';
 import {resolveDataPoint} from '../shared/data-point.mjs';
+const createDataService=options=>dataService({weatherProvider:'open-meteo',...options});
 const now=Date.parse('2026-11-13T10:00:00Z');
 const dates=Array.from({length:7},(_,i)=>`2026-11-${13+i}`);
 const weather=()=>({timezone:'Africa/Lagos',latitude:12,longitude:8.6,current_units:{temperature_2m:'°C',relative_humidity_2m:'%'},current:{time:'2026-11-13T11:00',temperature_2m:30,relative_humidity_2m:20},daily_units:{temperature_2m_max:'°C',temperature_2m_min:'°C',precipitation_sum:'mm',et0_fao_evapotranspiration:'mm'},daily:{time:dates,temperature_2m_max:[30,null,32,33,34,35,36],temperature_2m_min:Array(7).fill(20),precipitation_sum:Array(7).fill(0),et0_fao_evapotranspiration:Array(7).fill(5)}});
