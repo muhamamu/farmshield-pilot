@@ -11,6 +11,7 @@ import "./cloud-storage.css";
 import "./admin-map.css";
 import "./nigeria-map.css";
 import "./legal.css";
+import "./redesign.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

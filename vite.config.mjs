@@ -6,6 +6,17 @@ export default defineConfig({
   resolve: { preserveSymlinks: process.platform === 'win32' },
   build: {
     outDir: "dist/client",
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          const modulePath = id.replaceAll('\\', '/');
+          if (modulePath.includes('/node_modules/leaflet/')) return 'leaflet';
+          if (modulePath.includes('/node_modules/@supabase/')) return 'supabase';
+          if (modulePath.includes('/node_modules/@phosphor-icons/')) return 'phosphor-icons';
+          if (/\/node_modules\/(react|react-dom|scheduler)\//.test(modulePath)) return 'react-vendor';
+        },
+      },
+    },
   },
   optimizeDeps: {
     include: ["react", "react-dom/client"],
