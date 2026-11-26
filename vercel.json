@@ -6,12 +6,15 @@
       "framework": "vite",
       "buildCommand": "npm run build && npm test",
       "outputDirectory": "dist/client",
-      "functions": { "api/index.js": { "maxDuration": 30 } },
       "routes": [
-        { "src": "/api(?:/.*)?", "dest": "/api/index" },
         { "handle": "filesystem" },
         { "src": "/[^.]*", "dest": "/index.html" }
       ]
+    },
+    "data-api": {
+      "root": ".",
+      "entrypoint": "server.ts",
+      "maxDuration": 30
     },
     "malware-scanner": {
       "root": "scanner",
@@ -22,8 +25,7 @@
   },
   "rewrites": [
     { "source": "/internal/malware-scan/:path*", "destination": { "service": "malware-scanner" } },
-    { "source": "/api/:path*", "destination": { "service": "frontend" } },
+    { "source": "/api/:path*", "destination": { "service": "data-api" } },
     { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]
 }
-
