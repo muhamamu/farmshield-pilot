@@ -17,8 +17,7 @@
       "root": "scanner",
       "runtime": "container",
       "entrypoint": "Dockerfile.vercel",
-      "memory": 4096,
-      "maxDuration": 300
+      "functions": { "Dockerfile.vercel": { "maxDuration": 300 } }
     }
   },
   "rewrites": [
