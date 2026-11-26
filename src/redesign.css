@@ -49,3 +49,7 @@ button,a,input,textarea,select,summary{ -webkit-tap-highlight-color:transparent 
 @media(max-width:680px){.map-control-rail>button,.map-zoom-group button{width:44px;min-width:44px;height:44px;min-height:44px}.calm-app .account-nav{min-width:44px;min-height:44px}.calm-app .farm-quick-nav button{min-height:44px}.boundary-coordinate-inputs{grid-template-columns:1fr}.boundary-coordinate-actions{display:grid;grid-template-columns:1fr 1fr}}
 @media(max-width:680px){.profile-navigation button,.profile-back,.account-back,.legal-tabs a,.calm-app .workspace-tabs button{min-height:44px}.calm-app .admin-nav{display:none}}
 @media(max-width:680px){.calm-app button,.profile-page button,.admin-page button,.legal-page button,.legal-footer button,.account-layout button,.certificate-status button,.calm-app summary,.profile-page summary,.admin-page summary,.legal-page summary,.legal-tabs a,.admin-top .secondary{min-height:44px}}
+
+/* Keep map controls beneath the workspace drawer when it opens. */
+.calm-app .app-body{isolation:isolate}
+
