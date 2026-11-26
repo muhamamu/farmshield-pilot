@@ -13,8 +13,7 @@
     },
     "data-api": {
       "root": ".",
-      "entrypoint": "server.ts",
-      "maxDuration": 30
+      "entrypoint": "server.ts"
     },
     "malware-scanner": {
       "root": "scanner",
