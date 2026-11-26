@@ -53,3 +53,19 @@ button,a,input,textarea,select,summary{ -webkit-tap-highlight-color:transparent 
 /* Keep map controls beneath the workspace drawer when it opens. */
 .calm-app .app-body{isolation:isolate}
 
+.land-approved-badge{background:#e6efdc!important;color:#285137!important}
+.land-improvement-badge{background:#f3ead5!important;color:#76591f!important}
+.admin-review-form.land-assessment-form,.submitted-land-documents,.farmer-land-documents{margin-top:22px;padding:20px;border:1px solid var(--fs-line);border-radius:13px;background:var(--fs-paper)}
+.submitted-land-documents h3,.farmer-land-documents h3{margin:0 0 12px;color:var(--fs-ink);font-size:18px}
+.submitted-land-documents>ul,.farmer-land-documents>ul{list-style:none;margin:0;padding:0}
+.submitted-land-document,.farmer-land-documents li{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:16px 0;border-top:1px solid var(--fs-line)}
+.submitted-land-document>div:first-child,.farmer-land-documents li>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.submitted-land-document strong,.farmer-land-documents li strong{color:var(--fs-ink);font-size:14px}
+.submitted-land-document span,.submitted-land-document small,.farmer-land-documents li span,.farmer-land-documents li small{color:var(--fs-muted);font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.submitted-land-document-actions{display:flex;flex-direction:column;align-items:stretch;gap:12px;min-width:min(100%,280px)}
+.submitted-land-document-actions .secondary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;border:1px solid #b9c9b0;border-radius:9px;background:var(--fs-paper);color:var(--fs-green);font-size:12px;text-decoration:none;text-align:center}
+.submitted-land-document .admin-review-form{margin-top:0;padding:14px}
+.farmer-document-access{margin-top:12px;border-top:1px solid var(--fs-line)}
+.farmer-document-access>summary{min-height:44px;display:flex;align-items:center;color:var(--fs-green);font-size:12px;font-weight:600;cursor:pointer}
+@media(max-width:680px){.submitted-land-document,.farmer-land-documents li{flex-direction:column}.submitted-land-document-actions{width:100%;min-width:0}.admin-review-form.land-assessment-form,.submitted-land-documents,.farmer-land-documents{padding:15px}}
+
