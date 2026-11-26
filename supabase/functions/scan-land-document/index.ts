@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 const bucket = "farmshield-land-documents";
-const scannerUrl = "https://farmshield-pilot.vercel.app/internal/malware-scan/scan";
+const scannerUrl = "https://farmshield-pilot-mamus-projects-2ecace9c.vercel.app/internal/malware-scan/scan";
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
