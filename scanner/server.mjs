@@ -127,7 +127,7 @@ async function waitForClamd() {
 let engineVersion = '';
 let selfTestPassed = false;
 const server = createServer(async (req, res) => {
-  if (req.method === 'GET' && (req.url === '/healthz' || req.url === '/')) {
+  if (req.method === 'GET' && (req.url === '/healthz' || req.url === '/' || req.url === '/internal/malware-scan/healthz')) {
     return send(res, engineVersion && selfTestPassed ? 200 : 503, { ready: Boolean(engineVersion && selfTestPassed), self_test_passed: selfTestPassed, engine: engineVersion || undefined });
   }
   if (req.method !== 'POST' || req.url !== '/internal/malware-scan/scan') return send(res, 404, { error: 'Not found' });
