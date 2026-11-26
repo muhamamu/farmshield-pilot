@@ -23,7 +23,7 @@
   "rewrites": [
     { "source": "/internal/malware-scan/:path*", "destination": { "service": "malware-scanner" } },
     { "source": "/api/:path*", "destination": { "service": "frontend" } },
-    { "source": "/:path*", "destination": { "service": "frontend" } }
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]
 }
 
