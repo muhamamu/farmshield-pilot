@@ -69,3 +69,6 @@ button,a,input,textarea,select,summary{ -webkit-tap-highlight-color:transparent 
 .farmer-document-access>summary{min-height:44px;display:flex;align-items:center;color:var(--fs-green);font-size:12px;font-weight:600;cursor:pointer}
 @media(max-width:680px){.submitted-land-document,.farmer-land-documents li{flex-direction:column}.submitted-land-document-actions{width:100%;min-width:0}.admin-review-form.land-assessment-form,.submitted-land-documents,.farmer-land-documents{padding:15px}}
 
+
+
+.land-document-actions,.farmer-document-actions{display:flex;flex-direction:column;gap:10px;min-width:min(100%,220px)}
